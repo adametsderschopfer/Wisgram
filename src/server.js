@@ -16,15 +16,18 @@ import cluster from 'cluster';
 import { luscaConfig, corsOptions } from './utils/functions/config';
 import { cpus } from 'os';
 
+// add bluebird like Promise
 mongoose.Promise = bluebird;
 
 const PORT = config.get('PORT') || 4001;
 const numCPUs = cpus().length;
 
+// initialize express and http
 const app = express();
 const httpServer = http.Server(app);
 const _io = io(httpServer);
 
+// load modules
 app.use(compression());
 app.use(helmet());
 app.use(lusca(luscaConfig));
