@@ -75,10 +75,15 @@ function fnMaster() {
   });
 }
 
-function childProcess() {
+async function childProcess() {
+  // TODO: connect to database's
   console.log(`Worker ${process.pid} started...`);
 
-  httpServer.listen(PORT);
+  ioProvider(httpServer);
+
+  httpServer.listen(PORT, () => {
+    console.log(`Server has been started on port: ${PORT} `);
+  });
 }
 
 startServer();
