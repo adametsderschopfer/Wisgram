@@ -33,6 +33,14 @@ app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
+// add static path
+app.use(express.static(path.join(__dirname, 'static')));
+
+// APIs routes
+app.use('/api/v1/auth', authRouter);
+app.use('/api/v1/user', userRouter);
+
+// function work with multithreads
 function startServer() {
   if (cluster.isMaster) {
     fnMaster();
