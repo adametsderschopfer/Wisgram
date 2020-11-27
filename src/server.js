@@ -1,20 +1,26 @@
-import http from 'http';
-import express from 'express';
-import compression from 'compression';
-import cors from 'cors';
-import morgan from 'morgan';
-import bodyParser from 'body-parser';
-import cookieParser from 'cookie-parser';
-import bluebird from 'bluebird';
-import helmet from 'helmet';
-import lusca from 'lusca';
-import io from 'socket.io';
-import mongoose from 'mongoose';
-import config from 'config';
-import cluster from 'cluster';
+const http = require('http');
+const express = require('express');
+const compression = require('compression');
+const cors = require('cors');
+const morgan = require('morgan');
+const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
+const bluebird = require('bluebird');
+const helmet = require('helmet');
+const lusca = require('lusca');
+const mongoose = require('mongoose');
+const config = require('config');
+const cluster = require('cluster');
 
-import { luscaConfig, corsOptions } from './utils/functions/config';
-import { cpus } from 'os';
+const { cpus } = require('os');
+const { luscaConfig, corsOptions } = './utils/functions/config';
+
+// routes
+const authRouter = require('./routes/api/v1/auth');
+const userRouter = require('./router/api/v1/user');
+
+// providers
+const ioProvider = require('./providers/io.provider');
 
 // add bluebird like Promise
 mongoose.Promise = bluebird;
