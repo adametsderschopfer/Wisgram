@@ -1,0 +1,18 @@
+{
+  "PORT": 4000,
+  "JWTSecret": "supersecret",
+
+  "MySql": {
+    "User": "",
+    "Password": "",
+    "Port": "",
+    "Host": "",
+    "Database": ""
+  },
+
+  "Mongo": {
+    "username": "",
+    "password": "",
+    "host": ""
+  }
+}
