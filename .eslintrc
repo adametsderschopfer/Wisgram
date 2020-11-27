@@ -1,0 +1,42 @@
+{
+  "plugins": [
+    "prettier",
+    "eslint-plugin-import"
+  ],
+  "extends": [
+    "eslint:recommended",
+    "plugin:prettier/recommended",
+    "prettier",
+    "eslint-config-airbnb"
+  ],
+  "parser": "babel-eslint",
+  "env": {
+    "es6": true,
+    "es2017": true,
+    "node": true
+  },
+  "rules": {
+    "semi": [
+      2,
+      "always"
+    ],
+    "no-unused-vars": "warn",
+    "prettier/prettier": [
+      "error",
+      {
+        "endOfLine": "auto"
+      }
+    ],
+    "linebreak-style": [
+      "error",
+      "windows"
+    ],
+    "requireForBlockBody": true
+  },
+  "parserOptions": {
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "jsx": true
+    }
+  }
+}
