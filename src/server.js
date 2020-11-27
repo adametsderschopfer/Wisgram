@@ -31,7 +31,6 @@ const numCPUs = cpus().length;
 // initialize express and http
 const app = express();
 const httpServer = http.Server(app);
-const _io = io(httpServer);
 
 // load modules
 app.use(compression());
