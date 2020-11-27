@@ -1,5 +1,4 @@
-import rp from 'app-root-path';
-import * as cors from 'cors';
+const rp = require('app-root-path');
 
 /*
   Environment:
@@ -59,7 +58,7 @@ const morganOptions = 'dev';
 /*
   Exports config variables
 */
-export {
+module.exports = {
   isDevelopment,
   isProduction,
   winstonOptions,
