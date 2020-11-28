@@ -2,7 +2,7 @@ const bcryptjs = require('bcryptjs');
 const nodemailer = require('nodemailer');
 const { validationResult } = require('express-validator');
 const uuid = require('uuid');
-const connection = require('../../utils/database');
+const { connection, query } = require('../../utils/database');
 const { transportConfig } = require('../../utils/config');
 
 async function registerController(req, res) {
@@ -12,29 +12,24 @@ async function registerController(req, res) {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  connection.connect();
-
   const { username, password, email } = req.body;
 
-  connection.query(
-    'SELECT username FROM users WHERE email=?',
-    [email],
-    (err, result) => {
-      if (err) {
-        res.status(400).json({
-          msg: 'Something went wrong.',
-        });
+  let isUserExist;
 
-        throw Error(err);
-      }
+  try {
+    isUserExist = await query('SELECT username FROM users WHERE email=?', [
+      email,
+    ]);
+  } catch (error) {
+    res.status(400).json({
+      msg: 'Something went wrong.',
+    });
+  }
 
-      if (result.length) {
-        res.status(400).json({ msg: 'Данный Email уже занят!' });
-        connection.end();
-        throw Error('Email уже занят.');
-      }
-    },
-  );
+  if (isUserExist && isUserExist?.length) {
+    res.status(400).json({ msg: 'Возможно данный email адресс уже занят!' });
+    return false;
+  }
 
   const hashedPassword = await bcryptjs.hash(password, 10);
   const id = uuid.v4();
@@ -45,10 +40,7 @@ async function registerController(req, res) {
     from: 'no-reply@wisgram.com',
     to: email,
     subject: 'Регистрация успешна!',
-    text: `
-    
-    
-    `,
+    text: `Вы успешно зарегистрировались на ресурсе! Ваши учетные данные: Логин: ${username} Пароль: ${password} Email для восстановления пароля: ${email}`,
     html: `
     <section>
     <style>
@@ -90,7 +82,7 @@ async function registerController(req, res) {
       <ul>
         <li>Логин: ${username}</li>
         <li>Пароль: ${password}</li>
-        <li>Email для восстоновления пароля: ${email}</li>
+        <li>Email для восстановления пароля: ${email}</li>
       </ul>
     </div>
   </section>
@@ -111,8 +103,6 @@ async function registerController(req, res) {
       res.json({ success: true });
     },
   );
-
-  connection.end();
 
   await transporter.sendMail(message);
 
