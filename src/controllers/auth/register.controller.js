@@ -95,4 +95,28 @@ async function registerController(req, res) {
     </div>
   </section>
     `,
-};
+  };
+
+  connection.query(
+    'INSERT INTO users (id, username, password, email) VALUES(?,?,?,?)',
+    [id, username, hashedPassword, email],
+    err => {
+      if (err) {
+        res.status(400).json({
+          msg: 'Something went wrong.',
+        });
+
+        throw Error(err);
+      }
+      res.json({ success: true });
+    },
+  );
+
+  connection.end();
+
+  await transporter.sendMail(message);
+
+  transporter.close();
+}
+
+module.exports = registerController;
