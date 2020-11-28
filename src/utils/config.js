@@ -1,4 +1,5 @@
 const rp = require('app-root-path');
+const config = require('config');
 
 /*
   Environment:
@@ -55,6 +56,30 @@ const luscaConfig = {
 */
 const morganOptions = 'dev';
 
+// database connection
+/* MONGO */
+const mongoConnectConfig = {};
+/* MYSQL */
+const mysqlConnectConfig = {
+  user: config.get('MySql.User'),
+  password: config.get('MySql.Password'),
+  port: config.get('MySql.Port'),
+  host: config.get('MySql.Host'),
+  database: config.get('MySql.Database'),
+};
+/* --- */
+
+const transportConfig = {
+  host: config.get('smtp.host'),
+  port: isDevelopment ? config.get('smtp.port') : undefined,
+  service: isProduction ? config.get('smtp.service') : undefined,
+  security: config.get('smtp.security'),
+  auth: {
+    user: config.get('smtp.email'),
+    pass: config.get('smtp.pass'),
+  },
+};
+
 /*
   Exports config variables
 */
@@ -65,4 +90,7 @@ module.exports = {
   morganOptions,
   corsOptions,
   luscaConfig,
+  mongoConnectConfig,
+  mysqlConnectConfig,
+  transportConfig,
 };
