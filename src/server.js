@@ -91,6 +91,12 @@ async function childProcess() {
   // TODO: connect to database's
   console.log(`Worker ${process.pid} started...`);
 
+  try {
+    await DatabaseConnections();
+  } catch (error) {
+    throw error;
+  }
+
   ioProvider(httpServer);
 
   httpServer.listen(PORT, () => {
