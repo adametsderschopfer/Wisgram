@@ -89,22 +89,22 @@ async function registerController(req, res) {
     `,
   };
 
-  connection.query(
-    'INSERT INTO users (id, username, password, email) VALUES(?,?,?,?)',
-    [id, username, hashedPassword, email],
-    err => {
-      if (err) {
-        res.status(400).json({
-          msg: 'Something went wrong.',
-        });
+  try {
+    await query(
+      'INSERT INTO users (id, username, password, email) VALUES(?,?,?,?)',
+      [id, username, hashedPassword, email],
+    );
 
-        throw Error(err);
-      }
-      res.json({ success: true });
-    },
-  );
+    res.json({ success: true });
 
-  await transporter.sendMail(message);
+    await transporter.sendMail(message);
+  } catch (error) {
+    res.status(400).json({
+      msg: 'Something went wrong.',
+    });
+
+    throw error;
+  }
 
   transporter.close();
 
