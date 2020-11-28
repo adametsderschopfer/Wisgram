@@ -3,11 +3,20 @@
   "JWTSecret": "supersecret",
 
   "MySql": {
-    "User": "",
-    "Password": "",
-    "Port": "",
-    "Host": "",
-    "Database": ""
+    "User": "root",
+    "Password": "root",
+    "Port": "3306",
+    "Host": "localhost",
+    "Database": "wisgram"
+  },
+
+  "smtp": {
+    "user": "Laila Moore",
+    "email": "laila23@ethereal.email",
+    "pass": "SkczmB1Ys8aACqwaJ6",
+    "host": "smtp.ethereal.email",
+    "port": "587",
+    "security": false
   },
 
   "Mongo": {

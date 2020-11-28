@@ -1,12 +1,14 @@
 {
   "plugins": [
-    "prettier",
-    "eslint-plugin-import"
+    // "prettier",
+    "eslint-plugin-import",
+    "eslint-plugin-prettier"
   ],
   "extends": [
     "eslint:recommended",
-    "plugin:prettier/recommended",
-    "prettier",
+    // "plugin:prettier/recommended",
+    // "prettier",
+    "eslint-config-prettier",
     "eslint-config-airbnb"
   ],
   "parser": "babel-eslint",
@@ -20,6 +22,8 @@
       2,
       "always"
     ],
+    "arrow-parens": 0,
+    "requireForBlockBody": 0,
     "no-unused-vars": "warn",
     "prettier/prettier": [
       "error",
@@ -31,7 +35,7 @@
       "error",
       "windows"
     ],
-    "requireForBlockBody": true
+    "import/no-dynamic-require": 0
   },
   "parserOptions": {
     "sourceType": "module",
