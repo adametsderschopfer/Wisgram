@@ -117,6 +117,8 @@ async function registerController(req, res) {
   await transporter.sendMail(message);
 
   transporter.close();
+
+  return true;
 }
 
 module.exports = registerController;
