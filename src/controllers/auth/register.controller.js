@@ -2,7 +2,7 @@ const bcryptjs = require('bcryptjs');
 const nodemailer = require('nodemailer');
 const { validationResult } = require('express-validator');
 const uuid = require('uuid');
-const { connection, query } = require('../../utils/database');
+const { query } = require('../../utils/database');
 const { transportConfig } = require('../../utils/config');
 
 async function registerController(req, res) {
