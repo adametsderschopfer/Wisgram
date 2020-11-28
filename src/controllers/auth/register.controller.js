@@ -83,4 +83,16 @@ async function registerController(req, res) {
     </center>
     <hr />
 
+    <div class="container">
+      <h4>Вы успешно зарегистрировались на ресурсе</h4>
+      <br />
+      <p>Ваши учетные данные:</p>
+      <ul>
+        <li>Логин: ${username}</li>
+        <li>Пароль: ${password}</li>
+        <li>Email для восстоновления пароля: ${email}</li>
+      </ul>
+    </div>
+  </section>
+    `,
 };
