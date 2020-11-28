@@ -48,6 +48,18 @@ app.use(express.static(path.join(__dirname, 'static')));
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/user', userRouter);
 
+/**
+ * Give away static react files if isProduction -> true (NODE_ENV === "production")
+ */
+
+if (isProduction) {
+  app.use(express.static(path.resolve(__dirname, 'client', 'build')));
+
+  app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
+  });
+}
+
 // function work with multithreads
 function startServer() {
   if (cluster.isMaster) {
