@@ -15,6 +15,9 @@ const cluster = require('cluster');
 const { cpus } = require('os');
 const { luscaConfig, corsOptions } = './utils/functions/config';
 
+// db
+const mysqlConn = require('./utils/database');
+
 // routes
 const authRouter = require('./routes/api/v1/auth');
 const userRouter = require('./router/api/v1/user');
