@@ -13,7 +13,13 @@ const config = require('config');
 const cluster = require('cluster');
 
 const { cpus } = require('os');
-const { luscaConfig, corsOptions } = './utils/functions/config';
+const {
+  luscaConfig,
+  corsOptions,
+  isProduction,
+  isDevelopment,
+  morganOptions,
+} = require('./utils/config');
 
 // db
 const mysqlConn = require('./utils/database');
