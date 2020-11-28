@@ -11,6 +11,7 @@ const lusca = require('lusca');
 const mongoose = require('mongoose');
 const config = require('config');
 const cluster = require('cluster');
+const path = require('path');
 
 const { cpus } = require('os');
 const {
@@ -26,7 +27,7 @@ const mysqlConn = require('./utils/database');
 
 // routes
 const authRouter = require('./routes/api/v1/auth');
-const userRouter = require('./router/api/v1/user');
+const userRouter = require('./routes/api/v1/user');
 
 // providers
 const ioProvider = require('./providers/io.provider');
@@ -82,6 +83,7 @@ function startServer() {
 function fnMaster() {
   console.log(`Master ${process.pid} is running`);
 
+  // eslint-disable-next-line no-plusplus
   for (let i = 0; i < numCPUs; i++) {
     console.log(`Forking process number ${i}...`);
 
@@ -103,7 +105,7 @@ async function childProcess() {
   try {
     await DatabaseConnections();
   } catch (error) {
-    throw error;
+    throw Error(error);
   }
 
   ioProvider(httpServer);
@@ -111,6 +113,15 @@ async function childProcess() {
   httpServer.listen(PORT, () => {
     console.log(`Server has been started on port: ${PORT} `);
   });
+}
+
+// function work with multithreads
+function startServer() {
+  if (cluster.isMaster) {
+    fnMaster();
+  } else if (cluster.isWorker) {
+    childProcess();
+  }
 }
 
 startServer();
