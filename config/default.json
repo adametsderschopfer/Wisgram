@@ -1,21 +1,21 @@
 {
-  "PORT": 4000,
-  "JWTSecret": "supersecret",
+  "PORT": 80,
+  "JWTSecret": "",
 
   "MySql": {
-    "User": "root",
-    "Password": "root",
-    "Port": "3306",
-    "Host": "localhost",
-    "Database": "wisgram"
+    "User": "",
+    "Password": "",
+    "Port": "",
+    "Host": "",
+    "Database": ""
   },
 
   "smtp": {
-    "user": "Laila Moore",
-    "email": "laila23@ethereal.email",
-    "pass": "SkczmB1Ys8aACqwaJ6",
-    "host": "smtp.ethereal.email",
-    "port": "587",
+    "user": "",
+    "email": "",
+    "pass": "",
+    "host": "",
+    "port": "",
     "security": false
   },
 
