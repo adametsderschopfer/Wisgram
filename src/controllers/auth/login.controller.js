@@ -4,6 +4,14 @@ const bcrypt = require('bcryptjs');
 const config = require('config');
 const { query } = require('../../utils/database');
 
+const jwtExpirySeconds = 900;
+
+function generateAccessToken(data) {
+  return jwt.sign(data, config.get('JWTSecret'), {
+    expiresIn: jwtExpirySeconds,
+  });
+}
+
 module.exports = async (req, res) => {
   const errors = validationResult(req);
 
@@ -41,13 +49,21 @@ module.exports = async (req, res) => {
     throw error;
   }
 
-  const secret = config.get('JWTSecret');
-  const token = jwt.sign({ userId: _user.userId, email: _user.email }, secret, {
-    expiresIn: '30d',
-  });
-
-  res.cookie('token', token);
-
   delete _user.password;
-  res.json({ user: _user });
+
+  const secret = config.get('JWTSecret');
+
+  const accessToken = generateAccessToken({
+    userId: _user.userId,
+    email: _user.email,
+  });
+  const refreshToken = jwt.sign(
+    { email: _user.email, userId: _user.userId },
+    secret,
+  );
+
+  res.cookie('accessToken', accessToken);
+  res.cookie('refreshToken', refreshToken);
+
+  res.json({ _user });
 };

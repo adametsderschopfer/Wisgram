@@ -44,7 +44,7 @@ function validateRegistrationBody() {
 }
 
 function validateLoginBody() {
-  return [usernameValidator, passwordValidator];
+  return [body('email').exists().trim().isEmail(), passwordValidator];
 }
 
 module.exports = {
