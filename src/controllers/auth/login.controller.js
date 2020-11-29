@@ -2,7 +2,9 @@ const { validationResult } = require('express-validator');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const config = require('config');
+const nodemailer = require('nodemailer');
 const { query } = require('../../utils/database');
+const { transportConfig } = require('../../utils/config');
 
 const jwtExpirySeconds = 900;
 
@@ -66,4 +68,11 @@ module.exports = async (req, res) => {
   res.cookie('refreshToken', refreshToken);
 
   res.json({ _user });
+
+  nodemailer.createTransport(transportConfig).sendMail({
+    from: 'no-reply@wisgram.com',
+    to: _user.email,
+    subject: 'Выполнен вход в аккаунт.',
+    text: `Был произведен вход в аккаунт в ${new Date().toISOString()}`,
+  });
 };
