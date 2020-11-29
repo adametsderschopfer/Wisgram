@@ -1,6 +1,10 @@
 const { body } = require('express-validator');
 
 function isEqualsPasswords(value, { req }) {
+  if (!value || !req.body.password) {
+    throw new Error('Password is not exists');
+  }
+
   if (value !== req.body.password) {
     throw new Error('Password confirmation does not match password.');
   }
@@ -19,7 +23,7 @@ function isTrue(value) {
 const usernameValidator = body('username')
   .not()
   .isEmpty()
-  .isLength({ min: 8, max: 60 })
+  .isLength({ min: 6, max: 60 })
   .trim()
   .not()
   .matches(' ')
@@ -57,4 +61,5 @@ module.exports = {
   isEqualsPasswords,
   emailValidator,
   repeatPasswordValidator,
+  passwordValidator,
 };

@@ -54,6 +54,13 @@ function checkUserExist(req, res) {
 
 function resetPassword(req, res) {
   const msg = 'Ошибки при вводе кода! Код неверен или не действителен!';
+
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   const { resetCodeU, email, password } = req.body;
 
   if (!resetCodeU || !email) {
@@ -62,7 +69,7 @@ function resetPassword(req, res) {
     });
   }
 
-  query('SELECT resetCode FROM users WHERE email=?', [email])
+  return query('SELECT resetCode FROM users WHERE email=?', [email])
     .then(async ([{ resetCode }]) => {
       if (resetCode === resetCodeU) {
         const newHashedPassword = await bcrypt.hash(password, 10);
