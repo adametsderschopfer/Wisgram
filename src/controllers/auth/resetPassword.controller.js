@@ -1,11 +1,12 @@
 const config = require('config');
 const { validationResult } = require('express-validator');
-const nodemailer = require('nodemailer');
+const bcrypt = require('bcryptjs');
 const { query } = require('../../utils/database');
 const { generateCode, shortedEmail } = require('../../utils');
-const { transportConfig } = require('../../utils/config');
+const { senderMail } = require('../../utils');
 
 function checkUserExist(req, res) {
+  const msg = 'Пользователь с таким email не найден!';
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
@@ -19,23 +20,16 @@ function checkUserExist(req, res) {
     .then(async ([{ email }]) => {
       if (email) {
         const code = generateCode();
-        const transporter = nodemailer.createTransport(transportConfig);
-        const message = {
-          from: 'no-reply@wisgram.com',
-          to: email,
-          subject: 'Попытка восстоновления пароля.',
-          text: `Код для восстановления пароля: ${code}. Если вы ничего не отсылали просто проигнорируйте это письмо.`,
-        };
 
         try {
-          await query('UPDATE Users SET resetCode=? WHERE email=?', [
+          await query('UPDATE users SET resetCode=? WHERE email=?', [
             code,
             email,
           ]);
-
-          await transporter.sendMail(message);
         } catch (error) {
-          res.json({ msg: 'Что то пошло не так повторите попытку позже.' });
+          res
+            .status(400)
+            .json({ msg: 'Что то пошло не так повторите попытку позже.' });
 
           throw error;
         }
@@ -43,17 +37,78 @@ function checkUserExist(req, res) {
         res.json({
           msg: `Код был отправлен на почту ${shortedEmail(email)}`,
         });
+
+        await senderMail(
+          email,
+          'Попытка восстаоновления пароля.',
+          `Код для восстановления пароля: ${code}. Если вы ничего не отсылали просто проигнорируйте это письмо.`,
+        );
       } else {
-        res.json({ msg: 'Пользователь с таким email не найден!' });
+        res.json({ msg });
       }
     })
     .catch(() => {
-      res.json({ msg: 'Пользователь с таким email не найден!' });
+      res.status(400).json({ msg });
     });
 }
 
-function codeValidation(req, res) {}
+function resetPassword(req, res) {
+  const msg = 'Ошибки при вводе кода! Код неверен или не действителен!';
+  const { resetCodeU, email, password } = req.body;
 
-function resetPassword(req, res) {}
+  if (!resetCodeU || !email) {
+    return res.status(400).json({
+      msg,
+    });
+  }
 
+  query('SELECT resetCode FROM users WHERE email=?', [email])
+    .then(async ([{ resetCode }]) => {
+      if (resetCode === resetCodeU) {
+        const newHashedPassword = await bcrypt.hash(password, 10);
+
+        const removeResetCode = () => {
+          query('UPDATE users SET resetCode=? WHERE email=?', [null, email]);
+        };
+
+        query('UPDATE users SET password=? WHERE email=?', [
+          newHashedPassword,
+          email,
+        ])
+          .then(async () => {
+            res.json({
+              success: true,
+              msg: 'Пароль успешно изменен!',
+            });
+
+            await senderMail(
+              email,
+              'Пароль успешно изменен.',
+              `Пароль успешно изменен. Ваш новый пароль: ${password}`,
+            );
+
+            removeResetCode();
+          })
+          .catch(err => {
+            res.status(400).json({
+              msg:
+                'Возникли проблеммы в ходе смены пароля, пожалуйста попробуйте позже.',
+            });
+
+            removeResetCode();
+          });
+      } else {
+        throw msg;
+      }
+    })
+    .catch(() =>
+      res.status(400).json({
+        msg,
+      }),
+    );
+}
+
+module.exports = {
+  checkUserExist,
+  resetPassword,
 };

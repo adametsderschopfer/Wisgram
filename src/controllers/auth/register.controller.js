@@ -1,9 +1,8 @@
 const bcryptjs = require('bcryptjs');
-const nodemailer = require('nodemailer');
 const { validationResult } = require('express-validator');
 const uuid = require('uuid');
 const { query } = require('../../utils/database');
-const { transportConfig } = require('../../utils/config');
+const { senderMail } = require('../../utils');
 
 async function registerController(req, res) {
   const errors = validationResult(req);
@@ -34,14 +33,26 @@ async function registerController(req, res) {
   const hashedPassword = await bcryptjs.hash(password, 10);
   const userId = uuid.v4();
 
-  const transporter = nodemailer.createTransport(transportConfig);
+  try {
+    await query(
+      'INSERT INTO users (userId, username, password, email) VALUES(?,?,?,?)',
+      [userId, username, hashedPassword, email],
+    );
 
-  const message = {
-    from: 'no-reply@wisgram.com',
-    to: email,
-    subject: 'Регистрация успешна!',
-    text: `Вы успешно зарегистрировались на ресурсе! Ваши учетные данные: Логин: ${username} Пароль: ${password} Email для восстановления пароля: ${email}`,
-    html: `
+    res.json({ success: true });
+  } catch (error) {
+    res.status(400).json({
+      msg: 'Something went wrong.',
+    });
+
+    throw error;
+  }
+
+  await senderMail(
+    email,
+    'Регистрация успешна!',
+    `Вы успешно зарегистрировались на ресурсе! Ваши учетные данные: Логин: ${username} Пароль: ${password} Email для восстановления пароля: ${email}`,
+    `
     <section>
     <style>
       body {
@@ -87,26 +98,7 @@ async function registerController(req, res) {
     </div>
   </section>
     `,
-  };
-
-  try {
-    await query(
-      'INSERT INTO users (userId, username, password, email) VALUES(?,?,?,?)',
-      [userId, username, hashedPassword, email],
-    );
-
-    res.json({ success: true });
-
-    await transporter.sendMail(message);
-  } catch (error) {
-    res.status(400).json({
-      msg: 'Something went wrong.',
-    });
-
-    throw error;
-  }
-
-  transporter.close();
+  );
 
   return true;
 }

@@ -24,19 +24,23 @@ const usernameValidator = body('username')
   .not()
   .matches(' ')
   .withMessage('Must contain a space.');
+
 const passwordValidator = body('password')
   .not()
   .isEmpty()
   .isLength({ min: 5, max: 60 });
+
 const repeatPasswordValidator = body('repeatPassword')
   .not()
   .isEmpty()
   .custom(isEqualsPasswords);
 
+const emailValidator = body('email').not().isEmpty().trim().isEmail();
+
 function validateRegistrationBody() {
   return [
     usernameValidator,
-    body('email').trim().isEmail(),
+    emailValidator,
     passwordValidator,
     repeatPasswordValidator,
     body('rulesAccepted').isBoolean().toBoolean().custom(isTrue),
@@ -44,11 +48,13 @@ function validateRegistrationBody() {
 }
 
 function validateLoginBody() {
-  return [body('email').exists().trim().isEmail(), passwordValidator];
+  return [emailValidator, passwordValidator];
 }
 
 module.exports = {
   validateRegistrationBody,
   validateLoginBody,
   isEqualsPasswords,
+  emailValidator,
+  repeatPasswordValidator,
 };

@@ -58,7 +58,7 @@ const morganOptions = 'dev';
 
 // database connection
 /* MONGO */
-const mongoConnectConfig = {};
+const mongoConnectConfig = ``;
 /* MYSQL */
 const mysqlConnectConfig = {
   user: config.get('MySql.User'),
