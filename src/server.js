@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 const http = require('http');
 const express = require('express');
 const compression = require('compression');
@@ -20,10 +21,8 @@ const {
   isProduction,
   isDevelopment,
   morganOptions,
+  mongoConnectConfig,
 } = require('./utils/config');
-
-// db
-const mysqlConn = require('./utils/database');
 
 // routes
 const authRouter = require('./routes/api/v1/auth');
@@ -46,10 +45,10 @@ const httpServer = http.Server(app);
 app.use(compression());
 app.use(helmet());
 app.use(lusca(luscaConfig));
-app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cors(corsOptions));
 
 if (isDevelopment) {
   app.use(morgan(morganOptions));
@@ -71,15 +70,6 @@ if (isProduction) {
   });
 }
 
-// function work with multithreads
-function startServer() {
-  if (cluster.isMaster) {
-    fnMaster();
-  } else if (cluster.isWorker) {
-    childProcess();
-  }
-}
-
 function fnMaster() {
   console.log(`Master ${process.pid} is running`);
 
@@ -98,8 +88,23 @@ function fnMaster() {
   });
 }
 
+function DatabaseConnections() {
+  return new Promise(async (resolve, reject) => {
+    await mongoose.connect(mongoConnectConfig, {
+      useUnifiedTopology: true,
+      useNewUrlParser: true,
+    });
+    const db = mongoose.connection;
+    db.on('error', reject);
+    db.once('open', () => {
+      console.log('connected to mongodb server');
+    });
+
+    resolve();
+  });
+}
+
 async function childProcess() {
-  // TODO: connect to database's
   console.log(`Worker ${process.pid} started...`);
 
   try {

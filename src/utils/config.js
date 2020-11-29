@@ -58,7 +58,10 @@ const morganOptions = 'dev';
 
 // database connection
 /* MONGO */
-const mongoConnectConfig = ``;
+const mongoConnectConfig = `mongodb+srv://${config.get(
+  'Mongo.username',
+)}:${config.get('Mongo.password')}${config.get('Mongo.host')}`;
+
 /* MYSQL */
 const mysqlConnectConfig = {
   user: config.get('MySql.User'),
