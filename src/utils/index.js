@@ -37,7 +37,7 @@ async function senderMail(to,subject,  text, html = undefined) {
   const message = {
     from: 'no-reply@wisgram.com',
     to,
-    subject
+    subject,
     text,
     html
   };
