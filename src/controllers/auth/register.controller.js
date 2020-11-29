@@ -32,7 +32,7 @@ async function registerController(req, res) {
   }
 
   const hashedPassword = await bcryptjs.hash(password, 10);
-  const id = uuid.v4();
+  const userId = uuid.v4();
 
   const transporter = nodemailer.createTransport(transportConfig);
 
@@ -91,8 +91,8 @@ async function registerController(req, res) {
 
   try {
     await query(
-      'INSERT INTO users (id, username, password, email) VALUES(?,?,?,?)',
-      [id, username, hashedPassword, email],
+      'INSERT INTO users (userId, username, password, email) VALUES(?,?,?,?)',
+      [userId, username, hashedPassword, email],
     );
 
     res.json({ success: true });
