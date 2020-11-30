@@ -67,7 +67,7 @@ module.exports = async (req, res) => {
   res.cookie('accessToken', accessToken);
   res.cookie('refreshToken', refreshToken);
 
-  res.json({ _user });
+  res.json({ user: _user });
 
   nodemailer.createTransport(transportConfig).sendMail({
     from: 'no-reply@wisgram.com',

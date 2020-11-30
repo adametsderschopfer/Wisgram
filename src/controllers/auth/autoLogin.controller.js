@@ -27,7 +27,7 @@ module.exports = (req, res) => {
       const user = await query('SELECT * FROM users WHERE userId=?', [userId]);
       delete user[0].password;
 
-      res.json({ user });
+      res.json({ user: user[0] });
     },
   );
 };

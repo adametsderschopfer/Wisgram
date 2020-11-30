@@ -6,6 +6,7 @@ const {
   validateLoginBody,
   emailValidator,
   repeatPasswordValidator,
+  passwordValidator,
 } = require('../../../../middlewares/validateBody.middleware');
 
 // controllers
@@ -32,6 +33,10 @@ router.post('/logout', (req, res) => {
 
 router.post('/resetpassword/checkuserexist', [emailValidator], checkUserExist);
 
-router.post('/resetpassword', [repeatPasswordValidator], resetPassword);
+router.post(
+  '/resetpassword',
+  [passwordValidator, repeatPasswordValidator],
+  resetPassword,
+);
 
 module.exports = router;
