@@ -1,6 +1,6 @@
 {
-  "watch": ["src/"],
-  "ignore": ["src/client"],
+  "watch": ["server/"],
+  "ignore": ["client/*"],
   "ext": "js,json",
   "exec": "babel-node ./src/server.js"
 }

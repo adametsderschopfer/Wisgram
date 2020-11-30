@@ -2,7 +2,7 @@
   "name": "wisgram",
   "version": "1.0.0",
   "description": "\"Wisgram\" applications for communication between people. The app was created for practice purposes and to add it to the portfolio.",
-  "main": "index.js",
+  "main": "bin/www.js",
   "dependencies": {
     "app-root-path": "^3.0.0",
     "async": "^3.2.0",
@@ -32,12 +32,12 @@
   },
   "scripts": {
     "test": "jest",
-    "start": "cross-env NODE_ENV=production node ./src/server.js",
-    "start:dev": "cross-env NODE_ENV=development nodemon --exec node ./src/server.js",
-    "start:client": "npm run start --prefix ./src/client",
+    "start": "cross-env NODE_ENV=production node ./bin/www.js",
+    "start:dev": "cross-env NODE_ENV=development nodemon --exec node ./bin/www.js",
+    "start:client": "npm run start --prefix ./client",
     "dev": "concurrently \"npm run start\" \"npm run start:client\"",
-    "client:build": "npm run build --prefix ./src/client",
-    "eslint": "eslint -- src/*",
+    "client:build": "npm run build --prefix ./client",
+    "eslint": "eslint -- ./",
     "eslint:fix": "eslint -- ./ --fix"
   },
   "repository": {
