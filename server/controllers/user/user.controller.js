@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const { validationResult } = require('express-validator');
 const { query } = require('../../utils/database');
 const { senderMail } = require('../../utils');
+const Cache = require('../../services/Cache.service');
 
 class UserController {
   static async profile(req, res) {
@@ -40,13 +41,27 @@ class UserController {
       });
   }
 
-  static async getUsers(req, res) {
-    
-  }
+  static async getUsers(req, res) {}
 
   static async editUser(req, res) {}
 
-  static async searchUser(req, res) {}
+  static async searchUser(req, res) {
+    const { username } = req.body;
+
+    const sql = `SELECT userId,
+    username,
+    email,
+    bio,
+    location,
+    company,
+    website,
+    facebook,
+    instagram,
+    twitter,
+    github FROM users WHERE username LIKE ?`;
+
+    return query(sql, [username]).then().catch();
+  }
 
   static async removeUser(req, res) {}
 

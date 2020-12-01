@@ -1,6 +1,7 @@
 const router = require('express').Router();
 
 const verifyAuth = require('../../../../middlewares/auth.middleware');
+const Cache = require('../../../../services/Cache.service');
 
 const {
   profile,
@@ -16,7 +17,7 @@ const {
   repeatPasswordValidator,
 } = require('../../../../middlewares/validateBody.middleware');
 
-router.get('/profile/:userId', verifyAuth, profile);
+router.get('/profile/:userId', verifyAuth, Cache.user.profile, profile);
 
 router.get('/search/:username', verifyAuth, searchUser);
 
