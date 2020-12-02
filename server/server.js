@@ -11,6 +11,7 @@ const lusca = require('lusca');
 const mongoose = require('mongoose');
 const config = require('config');
 const path = require('path');
+const rp = require('app-root-path').path;
 
 const {
   luscaConfig,
@@ -18,8 +19,8 @@ const {
   isProduction,
   isDevelopment,
   morganOptions,
-  mongoConnectConfig,
 } = require('./utils/config');
+
 
 // routes
 const authRouter = require('./routes/api/v1/auth');
@@ -56,11 +57,11 @@ app.use(`/api/${app.get('API_VERSION')}/user`, userRouter);
  */
 
 if (isProduction) {
-  app.use(express.static(path.resolve(__dirname, 'client', 'build')));
+  app.use(express.static(path.resolve(rp, 'client', 'build')));
 
   app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
+    res.sendFile(path.resolve(rp, 'client', 'build', 'index.html'));
   });
 }
 
-module.exports = app;
+module.exports = { app };
