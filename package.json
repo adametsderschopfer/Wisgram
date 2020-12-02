@@ -27,13 +27,14 @@
     "mysql2": "^2.2.5",
     "node-cron": "^2.0.3",
     "nodemailer": "^6.4.16",
+    "redis": "^3.0.2",
     "socket.io": "^3.0.3",
     "uuid": "^8.3.1"
   },
   "scripts": {
     "test": "jest",
     "start": "cross-env NODE_ENV=production node ./bin/www.js",
-    "start:dev": "cross-env NODE_ENV=development nodemon --exec node ./bin/www.js",
+    "start:dev": "cross-env NODE_ENV=development NODE_OPTIONS=--trace-warnings nodemon --exec node ./bin/www.js",
     "start:client": "npm run start --prefix ./client",
     "dev": "concurrently \"npm run start\" \"npm run start:client\"",
     "client:build": "npm run build --prefix ./client",
