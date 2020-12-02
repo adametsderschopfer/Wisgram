@@ -44,9 +44,26 @@ class UserController {
   }
 
   static getOwnUsers(req, res) {
-    /*
-      Cache.set(userId, JSON.stringify(users), 3600) // userId is own
-    */
+    const { userId } = req.user;
+
+    User.findOne({ userId })
+      .then(result => {
+        if (result) {
+          if (result.friends?.length) {
+            Cache.set(`ownUsers${userId}`, JSON.stringify(result.friends), 900);
+          }
+
+          res.json({ friends: result.friends || [] });
+        } else {
+          res.json({ friends: [] });
+        }
+      })
+      .catch(err => {
+        if (err) {
+          console.error(err);
+          res.status(503);
+        }
+      });
   }
 
   static editUser(req, res) {
