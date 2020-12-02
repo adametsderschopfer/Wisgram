@@ -6,7 +6,7 @@ const { senderMail } = require('../../utils');
 const Cache = require('../../services/Cache.service');
 
 class UserController {
-  static async profile(req, res) {
+  static profile(req, res) {
     const errMessage = 'Возникла ошибка при получение профиля пользователя';
     const { userId } = req.params;
 
@@ -33,6 +33,8 @@ class UserController {
           success: true,
           profile: { ...result[0] },
         });
+
+        Cache.set(userId, JSON.stringify(result[0]), 3600);
       })
       .catch(err => {
         if (err) {
@@ -41,12 +43,21 @@ class UserController {
       });
   }
 
-  static async getUsers(req, res) {}
+  static getOwnUsers(req, res) {
+    /*
+      Cache.set(userId, JSON.stringify(users), 3600) // userId is own
+    */
+  }
 
-  static async editUser(req, res) {}
+  static editUser(req, res) {}
 
-  static async searchUser(req, res) {
-    const { username } = req.body;
+  static searchUser(req, res) {
+    const errMsg = 'По данному запросу ничего не было найденно.';
+    const { q } = req.query;
+
+    if (!q || q === null || q === undefined || !q?.length) {
+      return res.status(204);
+    }
 
     const sql = `SELECT userId,
     username,
@@ -60,14 +71,60 @@ class UserController {
     twitter,
     github FROM users WHERE username LIKE ?`;
 
-    return query(sql, [username]).then().catch();
+    return query(sql, [`%${q.toString()}%`])
+      .then(data => {
+        if (!data?.length) {
+          return res.status(400).json({ msg: errMsg });
+        }
+
+        res.json({
+          success: true,
+          result: data,
+        });
+
+        Cache.set(q, JSON.stringify(data), 600);
+      })
+      .catch(err => {
+        if (err) {
+          res.status(400).json({ msg: errMsg });
+
+          throw err;
+        }
+      });
   }
 
-  static async removeUser(req, res) {}
+  static removeUser(req, res) {}
 
-  static async addUser(req, res) {}
+  static deleteAccount(req, res) {
+    const { userId } = req.user;
 
-  static async resetPassword(req, res) {}
+    if (!userId) {
+      return res.status(401);
+    }
+
+    const sql = 'DELETE FROM users WHERE userId = ?';
+
+    query(sql, [userId])
+      .then(info => {
+        res.json({ msg: 'Аккаунт успешно удален. Прощайте!' });
+      })
+      .catch(err => {
+        if (err) {
+          res
+            .status(401)
+            .json({ msg: 'Что то пошло не так при удаление аккаунта.' });
+          throw err;
+        }
+      });
+
+    /*
+      TODO: REMOVE DATA ABOUT ACCOUNT FROM MONGODB WHEN TO SETTING IT (mongo)
+    */
+  }
+
+  static addUser(req, res) {}
+
+  static resetPassword(req, res) {}
 }
 
 module.exports = UserController;
