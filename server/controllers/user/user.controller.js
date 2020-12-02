@@ -49,7 +49,64 @@ class UserController {
     */
   }
 
-  static editUser(req, res) {}
+  static editUser(req, res) {
+    const {
+      username,
+      email,
+      bio = null,
+      location = null,
+      company = null,
+      website = null,
+      facebook = null,
+      instagram = null,
+      twitter = null,
+      github = null,
+    } = req.body;
+
+    if (!username && !email) {
+      return res
+        .status(401)
+        .json({ msg: 'Поля Username и Email не должны быть пустыми!' });
+    }
+
+    const sql = `UPDATE users SET username=?,
+    email=?,
+    bio=?,
+    location=?,
+    company=?,
+    website=?,
+    facebook=?,
+    instagram=?,
+    twitter=?,
+    github WHERE userId=?`;
+
+    return query(sql, [
+      username,
+      email,
+      bio,
+      location,
+      company,
+      website,
+      facebook,
+      instagram,
+      twitter,
+      github,
+      req.user.userId,
+    ])
+      .then(() => {
+        res.status(204).json({
+          msg: 'Профиль успешно обновлен!',
+        });
+      })
+      .catch(err => {
+        res.status(400).json({
+          msg:
+            'Что-то пошло не так при попытке редактирования профиля пожалуйста проверьте заполненные поля и повторите вновь!',
+        });
+
+        console.err(err);
+      });
+  }
 
   static searchUser(req, res) {
     const errMsg = 'По данному запросу ничего не было найденно.';
