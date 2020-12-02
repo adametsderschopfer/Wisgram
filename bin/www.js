@@ -2,14 +2,13 @@ const http = require('http');
 const cluster = require('cluster');
 const { cpus } = require('os');
 const mongoose = require('mongoose');
-const app = require('../server/server');
-
+const { app } = require('../server/server');
 const { mongoConnectConfig } = require('../server/utils/config');
 
 const PORT = app.get('PORT');
 
 // providers
-const ioProvider = require('../server/providers/io.provider');
+const SocketServer = require('../server/providers/SocketServer.provider');
 
 const numCPUs = cpus().length;
 
@@ -58,7 +57,7 @@ async function childProcess() {
     throw Error(error);
   }
 
-  ioProvider(httpServer);
+  SocketServer(httpServer);
 
   httpServer.listen(PORT, () => {
     console.log(`Server has been started on port: ${PORT} `);
