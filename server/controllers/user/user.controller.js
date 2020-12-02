@@ -1,6 +1,6 @@
-const mongoose = require('mongoose');
+/* eslint-disable no-console */
 const bcrypt = require('bcryptjs');
-const { validationResult } = require('express-validator');
+const User = require('../../models/User.model');
 const { query } = require('../../utils/database');
 const { senderMail } = require('../../utils');
 const Cache = require('../../services/Cache.service');
@@ -162,7 +162,9 @@ class UserController {
     const sql = 'DELETE FROM users WHERE userId = ?';
 
     query(sql, [userId])
-      .then(info => {
+      .then(async info => {
+        await User.findByIdAndDelete(userId);
+
         res.json({ msg: 'Аккаунт успешно удален. Прощайте!' });
       })
       .catch(err => {
