@@ -4,9 +4,7 @@ const bcrypt = require('bcryptjs');
 const config = require('config');
 const nodemailer = require('nodemailer');
 const { query } = require('../../utils/database');
-const { transportConfig } = require('../../utils/config');
-
-const jwtExpirySeconds = 900;
+const { transportConfig, jwtExpirySeconds } = require('../../utils/config');
 
 function generateAccessToken(data) {
   return jwt.sign(data, config.get('JWTSecret'), {

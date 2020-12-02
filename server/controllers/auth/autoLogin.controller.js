@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const config = require('config');
 const { query } = require('../../utils/database');
 
-const jwtExpirySeconds = 900;
+const { jwtExpirySeconds } = require('../../utils/config');
 
 function generateAccessToken(data) {
   return jwt.sign(data, config.get('JWTSecret'), {

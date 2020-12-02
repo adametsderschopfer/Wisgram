@@ -84,6 +84,12 @@ const transportConfig = {
 };
 
 /*
+  JWT expire
+*/
+
+const jwtExpirySeconds = 604800; // seven days
+
+/*
   Exports config variables
 */
 module.exports = {
@@ -96,4 +102,5 @@ module.exports = {
   mongoConnectConfig,
   mysqlConnectConfig,
   transportConfig,
+  jwtExpirySeconds,
 };
