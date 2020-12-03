@@ -8,30 +8,37 @@ const {
   editUser,
   getOwnUsers,
   searchUser,
-  removeUser,
-  addUser,
+  acceptRequestUser,
+  rejectRequestUser,
   resetPassword,
   deleteAccount,
+  addtofriends,
+  removefromfriends,
 } = require('../../../../controllers/user/user.controller');
 
 const {
   repeatPasswordValidator,
+  passwordValidator,
 } = require('../../../../middlewares/validateBody.middleware');
 
 router.get('/profile/:userId', verifyAuth, Cache.user.profile, profile);
 
 router.get('/search', verifyAuth, Cache.user.search, searchUser);
 
-router.post('/removeuser/:userid', verifyAuth, removeUser);
-
 router.post(
   '/resetpassword',
   verifyAuth,
-  [repeatPasswordValidator],
+  [passwordValidator, repeatPasswordValidator],
   resetPassword,
 );
 
-router.post('/adduser/:userid', verifyAuth, addUser);
+router.post('/acceptrequest', verifyAuth, acceptRequestUser);
+
+router.post('/rejectrequest', verifyAuth, rejectRequestUser);
+
+router.post('/addtofriends', verifyAuth, rejectRequestUser);
+
+router.post('/removefromfriends', verifyAuth, rejectRequestUser);
 
 router.get('/users', verifyAuth, Cache.user.ownUsers, getOwnUsers);
 

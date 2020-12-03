@@ -3,6 +3,7 @@ const { validationResult } = require('express-validator');
 const uuid = require('uuid');
 const { query } = require('../../utils/database');
 const { senderMail } = require('../../utils');
+const User = require('../../models/User.model');
 
 async function registerController(req, res) {
   const errors = validationResult(req);
@@ -38,6 +39,12 @@ async function registerController(req, res) {
       'INSERT INTO users (userId, username, password, email) VALUES(?,?,?,?)',
       [userId, username, hashedPassword, email],
     );
+
+    await new User({
+      userId,
+      friends: [],
+      status: false,
+    }).save();
 
     res.json({ success: true });
   } catch (error) {

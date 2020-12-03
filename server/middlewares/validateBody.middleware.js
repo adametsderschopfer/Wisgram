@@ -1,12 +1,8 @@
 const { body } = require('express-validator');
 
 function isEqualsPasswords(value, { req }) {
-  if (!value || !req.body.password) {
-    throw new Error('Password is not exists');
-  }
-
   if (value !== req.body.password) {
-    throw new Error('Password confirmation does not match password.');
+    return false;
   }
 
   return true;
@@ -37,7 +33,8 @@ const passwordValidator = body('password')
 const repeatPasswordValidator = body('repeatPassword')
   .not()
   .isEmpty()
-  .custom(isEqualsPasswords);
+  .custom(isEqualsPasswords)
+  .withMessage('Password is not equal repeat password');
 
 const emailValidator = body('email').not().isEmpty().trim().isEmail();
 

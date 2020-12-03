@@ -7,7 +7,7 @@ class Cache {
   static profileCache(req, res, next) {
     const { userId } = req.params;
 
-    redisClient.get(userId, (err, data) => {
+    redisClient.get(`profile#${userId}`, (err, data) => {
       if (err) throw err;
 
       if (data !== null) {
@@ -41,7 +41,7 @@ class Cache {
   static getOwnUsersCache(req, res, next) {
     const { userId } = req.user;
 
-    redisClient.get(userId, (err, data) => {
+    redisClient.get(`ownUsers${userId}`, (err, data) => {
       if (err) throw err;
 
       if (data !== null) {
@@ -53,8 +53,6 @@ class Cache {
         next();
       }
     });
-
-    next();
   }
 
   static get user() {
