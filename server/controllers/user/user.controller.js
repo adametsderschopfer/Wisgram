@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 const bcrypt = require('bcryptjs');
+const { validationResult } = require('express-validator');
 const User = require('../../models/User.model');
 const { query } = require('../../utils/database');
 const { senderMail } = require('../../utils');
@@ -34,7 +35,7 @@ class UserController {
           profile: { ...result[0] },
         });
 
-        Cache.set(userId, JSON.stringify(result[0]), 3600);
+        Cache.set(`profile#${userId}`, JSON.stringify(result[0]), 3600);
       })
       .catch(err => {
         if (err) {
@@ -167,10 +168,8 @@ class UserController {
       });
   }
 
-  static removeUser(req, res) {}
-
   static deleteAccount(req, res) {
-    const { userId } = req.user;
+    const { userId, email } = req.user;
 
     if (!userId) {
       return res.status(401);
@@ -178,7 +177,7 @@ class UserController {
 
     const sql = 'DELETE FROM users WHERE userId = ?';
 
-    query(sql, [userId])
+    return query(sql, [userId])
       .then(async info => {
         await User.findOneAndDelete({ userId });
 
@@ -201,13 +200,129 @@ class UserController {
           throw err;
         }
       });
-
-  static addUser(req, res) {
-    // Cache.set(`ownUsers${userId}`, JSON.stringify(result.friends), 900); // update cache with own users
   }
 
-  static removeUser(req, res) {
-    // Cache.set(`ownUsers${userId}`, JSON.stringify(result.friends), 900); // update cache with own users
+  static acceptRequestUser(req, res) {
+    const errMsg =
+      'Возникла ошибка при добавление пользователя. Повторите попытку вновь!';
+    const { userId } = req.user;
+
+    const { userId: friendId, username } = req.body;
+
+    if (!friendId && !username) {
+      return res.json({ msg: errMsg });
+    }
+
+    const frined = {
+      userId: friendId,
+      username,
+      messages: [],
+      isFriend: false,
+    };
+
+    return User.findOne({ userId })
+      .then(async own => {
+        own.stageOfAdding = [...own.stageOfAdding, frined];
+
+        await User.save();
+
+        res.json({ msg: 'Приглашение в друзья успешно отправленно!' });
+      })
+      .catch(err => {
+        if (err) {
+          res.status(406).json({ msg: errMsg });
+        }
+      });
+  }
+
+  static rejectRequestUser(req, res) {
+    const errMsg =
+      'Возникла ошибка при добавление пользователя. Повторите попытку вновь!';
+    const { userId } = req.user;
+
+    const { userId: friendId } = req.body;
+
+    if (!friendId) {
+      return res.json({ msg: errMsg });
+    }
+
+    return User.findOne({ userId })
+      .then(async own => {
+        own.stageOfAdding = own.stageOfAdding.filter(
+          friend => friend.userId !== friendId,
+        );
+
+        await User.save();
+
+        res.json({ msg: 'Приглашение в друзья отклонено!' });
+      })
+      .catch(err => {
+        if (err) {
+          res.status(406).json({ msg: errMsg });
+        }
+      });
+  }
+
+  static addtofriends(req, res) {
+    const { userId } = req.user;
+    const { userId: friendId } = req.body;
+
+    const errMsg =
+      'Возникла ошибка при добавление пользователя. Повторите попытку вновь!';
+    if (!friendId) {
+      return res.json({ msg: errMsg });
+    }
+
+    return User.findOne({ userId })
+      .then(async own => {
+        own.friends = [
+          ...own.friends,
+          own.stageOfAdding.filter(friend => friend.userId === friendId),
+        ];
+        own.stageOfAdding = own.stageOfAdding.filter(
+          friend => friend.userId !== friendId,
+        );
+
+        await User.save();
+
+        res.json({ msg: 'Приглашение в друзья успешно отправленно!' });
+
+        Cache.set(`ownUsers${userId}`, JSON.stringify(own.friends), 900); // update cache with own users
+      })
+      .catch(err => {
+        if (err) {
+          res.status(400).json({ msg: errMsg });
+        }
+      });
+  }
+
+  static removefromfriends(req, res) {
+    const { userId } = req.user;
+    const { userId: friendId } = req.body;
+
+    const errMsg =
+      'Возникла ошибка при удаление пользователя. Повторите попытку вновь!';
+    if (!friendId) {
+      return res.json({ msg: errMsg });
+    }
+
+    return User.findOne({ userId })
+      .then(async own => {
+        own.friends = own.stageOfAdding.filter(
+          friend => friend.userId !== friendId,
+        );
+
+        await User.save();
+
+        res.json({ msg: 'Пользователь удален из друзей!' });
+
+        Cache.set(`ownUsers${userId}`, JSON.stringify(own.friends), 900); // update cache with own users
+      })
+      .catch(err => {
+        if (err) {
+          res.status(400).json({ msg: errMsg });
+        }
+      });
   }
 
   static resetPassword(req, res) {
