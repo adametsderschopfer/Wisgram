@@ -186,6 +186,12 @@ class UserController {
         res.cookie('accessToken', null);
 
         res.json({ msg: 'Аккаунт успешно удален. Прощайте!' });
+
+        senderMail(
+          email,
+          'Аккаунт успешно удален!',
+          `Ваш аккаунт бы успешно удален в ${new Date().toUTCString()}`,
+        );
       })
       .catch(err => {
         if (err) {
