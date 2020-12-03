@@ -180,7 +180,7 @@ class UserController {
 
     query(sql, [userId])
       .then(async info => {
-        await User.findByIdAndDelete(userId);
+        await User.findOneAndDelete({ userId });
 
         res.cookie('refreshToken', null);
         res.cookie('accessToken', null);
