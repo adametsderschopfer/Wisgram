@@ -182,6 +182,9 @@ class UserController {
       .then(async info => {
         await User.findByIdAndDelete(userId);
 
+        res.cookie('refreshToken', null);
+        res.cookie('accessToken', null);
+
         res.json({ msg: 'Аккаунт успешно удален. Прощайте!' });
       })
       .catch(err => {
