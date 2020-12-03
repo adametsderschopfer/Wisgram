@@ -196,14 +196,70 @@ class UserController {
         }
       });
 
-    /*
-      TODO: REMOVE DATA ABOUT ACCOUNT FROM MONGODB WHEN TO SETTING IT (mongo)
-    */
+  static addUser(req, res) {
+    // Cache.set(`ownUsers${userId}`, JSON.stringify(result.friends), 900); // update cache with own users
   }
 
-  static addUser(req, res) {}
+  static removeUser(req, res) {
+    // Cache.set(`ownUsers${userId}`, JSON.stringify(result.friends), 900); // update cache with own users
+  }
 
-  static resetPassword(req, res) {}
+  static resetPassword(req, res) {
+    const errMsg =
+      'При попытке смены пароля возникла ошибка, повторите попытку повторно или позже!';
+    const errWithfield =
+      'Не все поля были переданны или корректны! Пожалуйста проверьте заполненные поля и повторите попытку вновь!';
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ msg: errWithfield });
+    }
+    const { password: newPassword, oldPassword } = req.body;
+    const { userId } = req.user;
+
+    if (!oldPassword || !newPassword) {
+      return res.status(401).json({
+        msg: errWithfield,
+      });
+    }
+
+    return query('SELECT password FROM users WHERE userId = ?', [userId])
+      .then(([{ password: oldPasswordHash }]) => {
+        bcrypt
+          .compare(oldPassword, oldPasswordHash)
+          .then(async isCompare => {
+            if (isCompare) {
+              const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+              const sql = 'UPDATE users SET password = ? WHERE userId = ?';
+
+              return query(sql, [hashedPassword, userId])
+                .then(({ warningStatus }) => {
+                  if (warningStatus > 0) {
+                    throw errMsg;
+                  }
+                  res.status(201).json({ msg: 'Пароль успешно обновлен!' });
+                })
+                .catch(err => {
+                  if (err) {
+                    res.status(400).json({ msg: errMsg });
+                  }
+                });
+            }
+            throw errMsg;
+          })
+          .catch(err => {
+            if (err) {
+              res.status(401).json({ msg: errMsg });
+            }
+          });
+      })
+      .catch(err => {
+        if (err) {
+          res.status(401).json({ msg: errMsg });
+        }
+      });
+  }
 }
 
 module.exports = UserController;
