@@ -1,9 +1,12 @@
 export interface IAppState {
   isLoading: boolean;
   alert_content: string;
+  isAlertCall: boolean;
 }
 
-export interface IAuthState {}
+export interface IAuthState {
+  isAuth: boolean
+}
 
 export interface IUserReducer {}
 

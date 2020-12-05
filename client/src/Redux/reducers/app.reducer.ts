@@ -4,6 +4,7 @@ import { AppConstants as Ac } from '../constants';
 const initialState: IAppState = {
   isLoading: false,
   alert_content: '',
+  isAlertCall: false,
 };
 
 function appReducer(state: IAppState = initialState, action: any) {
@@ -13,6 +14,8 @@ function appReducer(state: IAppState = initialState, action: any) {
       return { ...state, alert_content: action.alert_content };
     case Ac.ALERT_CLEAR_CONTENT:
       return { ...state, alert_content: action.alert_content };
+    case Ac.ALERT_CALL:
+      return { ...state, isAlertCall: !state.isAlertCall };
 
     // working with loading
     case Ac.LOADING_ON:
